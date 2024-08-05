@@ -285,6 +285,12 @@ backends.
 
 * ...
 
+* The new :meth:`~django.db.models.Model.is_pk_set()` method is added to
+  support checking whether the ``pk`` property (composite or not) has been set:
+
+  * ``obj.pk is not None`` -> ``obj.is_pk_set()``
+  * ``obj.pk is None`` -> ``not obj.is_pk_set()``
+
 :mod:`django.contrib.gis`
 -------------------------
 
