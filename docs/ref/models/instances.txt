@@ -975,7 +975,7 @@ Other attributes
     database.
 
 ``_is_pk_set()``
----------------
+----------------
 
 .. method:: Model._is_pk_set()
 
