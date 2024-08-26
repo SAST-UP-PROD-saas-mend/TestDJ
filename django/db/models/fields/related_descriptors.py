@@ -511,7 +511,7 @@ class ReverseOneToOneDescriptor:
         try:
             rel_obj = self.related.get_cached_value(instance)
         except KeyError:
-            if not instance.is_pk_set():
+            if not instance._is_pk_set():
                 rel_obj = None
             else:
                 filter_args = self.related.field.get_forward_related_filter(instance)
@@ -752,7 +752,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
             # Even if this relation is not to pk, we require still pk value.
             # The wish is that the instance has been already saved to DB,
             # although having a pk value isn't a guarantee of that.
-            if not self.instance.is_pk_set():
+            if not self.instance._is_pk_set():
                 raise ValueError(
                     f"{self.instance.__class__.__name__!r} instance needs to have a "
                     f"primary key value before this relationship can be used."
@@ -1080,7 +1080,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             # Even if this relation is not to pk, we require still pk value.
             # The wish is that the instance has been already saved to DB,
             # although having a pk value isn't a guarantee of that.
-            if not instance.is_pk_set():
+            if not instance._is_pk_set():
                 raise ValueError(
                     "%r instance needs to have a primary key value before "
                     "a many-to-many relationship can be used."

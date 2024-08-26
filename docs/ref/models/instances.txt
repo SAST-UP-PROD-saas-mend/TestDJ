@@ -974,15 +974,15 @@ Other attributes
     will have ``adding=False`` and ``db`` set to the alias of the associated
     database.
 
-``is_pk_set()``
+``_is_pk_set()``
 ---------------
 
-.. method:: Model.is_pk_set()
+.. method:: Model._is_pk_set()
 
-The ``is_pk_set()`` method decides whether the ``pk`` property has been _set_.
+The ``_is_pk_set()`` method decides whether the ``pk`` property has been _set_.
 
 The ``pk`` property is considered set if it's not ``None``.
 
 .. versionchanged:: 5.2
 
-    The ``is_pk_set()`` method was added.
+    The ``_is_pk_set()`` method was added.

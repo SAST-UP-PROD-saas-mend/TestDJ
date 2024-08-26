@@ -660,8 +660,8 @@ class ModelTest(TestCase):
         )
 
     def test_is_pk_set(self):
-        self.assertFalse(Article().is_pk_set())
-        self.assertTrue(Article(id=1).is_pk_set())
+        self.assertFalse(Article()._is_pk_set())
+        self.assertTrue(Article(id=1)._is_pk_set())
 
 
 class ModelLookupTest(TestCase):
