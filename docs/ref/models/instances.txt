@@ -979,7 +979,7 @@ Other attributes
 
 .. method:: Model._is_pk_set()
 
-The ``_is_pk_set()`` method decides whether the ``pk`` property has been _set_.
+The ``_is_pk_set()`` method returns whether the ``pk`` property has been _set_.
 
 The ``pk`` property is considered set if it's not ``None``.
 
