@@ -1097,7 +1097,6 @@ class Model(AltersData, metaclass=ModelBase):
                 if f.name in update_fields or f.attname in update_fields
             ]
 
-        pk_val = self._get_pk_val(meta)
         if not self._is_pk_set(meta):
             pk_val = meta.pk.get_pk_value_on_save(self)
             setattr(self, meta.pk.attname, pk_val)
@@ -1129,6 +1128,7 @@ class Model(AltersData, metaclass=ModelBase):
                 for f in non_pks_non_generated
             ]
             forced_update = update_fields or force_update
+            pk_val = self._get_pk_val(meta)
             updated = self._do_update(
                 base_qs, using, pk_val, values, update_fields, forced_update
             )
