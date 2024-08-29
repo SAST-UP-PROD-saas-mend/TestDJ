@@ -283,11 +283,8 @@ Database backend API
 This section describes changes that may be needed in third-party database
 backends.
 
-* The new :meth:`~django.db.models.Model._is_pk_set()` method is added to
-  support checking whether the ``pk`` property (composite or not) has been set:
-
-  * ``obj.pk is not None`` -> ``obj._is_pk_set()``
-  * ``obj.pk is None`` -> ``not obj._is_pk_set()``
+* The new :meth:`~django.db.models.Model._is_pk_set()` method allows to
+  check whether a Model instance has its primary key set or not.
 
 :mod:`django.contrib.gis`
 -------------------------
