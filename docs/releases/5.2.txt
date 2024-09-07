@@ -41,6 +41,18 @@ Minor features
   :ref:`extrabody <extrabody>` for adding custom code before the closing
   ``</body>`` tag.
 
+The following changes are made to the admin change form for improving
+accessibility:
+
+* Form fields in the change form are now shown below their respective labels
+  instead of next to them.
+
+* Help text in the change form is now shown after the field label and before
+  the field input.
+
+* Validation errors in the change form are now shown after the help text and
+  before the field input.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
