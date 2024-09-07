@@ -96,7 +96,6 @@ Widget attributes
 GeoDjango widgets are template-based, so their attributes are mostly different
 from other Django widget attributes.
 
-
 .. attribute:: BaseGeometryWidget.geom_type
 
     The OpenGIS geometry type, generally set by the form field.
@@ -174,8 +173,35 @@ Widget classes
 
         The default map zoom is ``12``.
 
+    .. versionchanged:: 5.2
+
+        ``OSMWidget`` doesn't use any custom template any longer. The
+        ``gis/openlayers-osm.html`` template is removed from the Django source
+        code.
+
     The :class:`OpenLayersWidget` note about JavaScript file hosting above also
     applies here. See also this `FAQ answer`_ about ``https`` access to map
     tiles.
 
     .. _FAQ answer: https://help.openstreetmap.org/questions/10920/how-to-embed-a-map-in-my-https-site
+
+Customizing the base layer used in OpenLayers-based widgets
+-----------------------------------------------------------
+
+If you need to customize the base layer shown in the OpenLayers-based geometry
+widgets, you should write a custom JavaScript file to add a new layer builder.
+For example::
+
+    MapWidget.layerBuilder.<custom_layer_name> = () => {
+        return new ol.layer.Tile({source: new ol.source.<ChosenSource>()});
+    }
+
+Then you can subclass a standard widget and add at a minimum::
+
+    from django.contrib.gis.forms.widgets import OpenLayersWidget
+
+    class YourCustomWidget(OpenLayersWidget):
+        base_layer_name = "custom_layer_name"
+
+        class Media:
+            js = ["path.to.jsfile"]

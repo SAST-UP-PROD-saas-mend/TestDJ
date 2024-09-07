@@ -295,6 +295,11 @@ backends.
 
 * Support for PostGIS 3.0 is removed.
 
+* Rendering of geometry widgets is rewritten to get rid of inline JavaScript in
+  templates. If you customized any of the geometry widgets from
+  ``django.contrib.gis.forms.widgets`` or their templates. You should check if
+  your version still runs with Django 5.2.
+
 Dropped support for PostgreSQL 13
 ---------------------------------
 

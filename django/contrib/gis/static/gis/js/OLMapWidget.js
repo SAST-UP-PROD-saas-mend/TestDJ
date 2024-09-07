@@ -38,6 +38,23 @@ class GeometryTypeControl extends ol.control.Control {
 
 // TODO: allow deleting individual features (#8972)
 class MapWidget {
+    static layerBuilder = {
+        nasaWorldview: () => {
+            return new ol.layer.Tile({
+                source: new ol.source.XYZ({
+                    attributions: "NASA Worldview",
+                    maxZoom: 8,
+                    url: "https://map1{a-c}.vis.earthdata.nasa.gov/wmts-webmerc/" +
+                         "BlueMarble_ShadedRelief_Bathymetry/default/%7BTime%7D/" +
+                         "GoogleMapsCompatible_Level8/{z}/{y}/{x}.jpg"
+                })
+            });
+        },
+        osm: () => {
+            return new ol.layer.Tile({source: new ol.source.OSM()});
+        }
+    };
+
     constructor(options) {
         this.map = null;
         this.interactions = {draw: null, modify: null};
@@ -58,9 +75,13 @@ class MapWidget {
                 this.options[property] = options[property];
             }
         }
+        // options.base_layer can be empty, or contain a layerBuilder key, or
+        // be a layer already consructed.
         if (!options.base_layer) {
-            this.options.base_layer = new ol.layer.Tile({source: new ol.source.OSM()});
-        }
+            this.baseLayer = MapWidget.layerBuilder.osm();
+        } else if (typeof options.base_layer === 'string') {
+            this.baseLayer = MapWidget.layerBuilder[options.base_layer]();
+        } else this.baseLayer = this.options.base_layer;
 
         this.map = this.createMap();
         this.featureCollection = new ol.Collection();
@@ -120,7 +141,7 @@ class MapWidget {
     createMap() {
         return new ol.Map({
             target: this.options.map_id,
-            layers: [this.options.base_layer],
+            layers: [this.baseLayer],
             view: new ol.View({
                 zoom: this.options.default_zoom
             })
@@ -230,4 +251,21 @@ class MapWidget {
         const jsonFormat = new ol.format.GeoJSON();
         document.getElementById(this.options.id).value = jsonFormat.writeGeometry(geometry);
     }
+}
+
+{
+    function initMapWidgetInSection(section) {
+        section.querySelectorAll(".dj_map_wrapper").forEach((wrapper) => {
+            // Avoid initializing map widget on an empty form.
+            if (wrapper.id.includes('__prefix__')) return;
+            const options = JSON.parse(wrapper.querySelector("#mapwidget-options").textContent);
+            options["id"] = wrapper.querySelector("textarea").id;
+            options["map_id"] = wrapper.querySelector(".dj_map").id;
+            new MapWidget(options);
+        });
+    }
+    document.addEventListener("DOMContentLoaded", () => {
+        initMapWidgetInSection(document);
+        document.addEventListener('formset:added', (ev) => {initMapWidgetInSection(ev.target)});
+    });
 }
