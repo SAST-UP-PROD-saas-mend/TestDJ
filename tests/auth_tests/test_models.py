@@ -1,7 +1,5 @@
 from unittest import mock
 
-from asgiref.sync import sync_to_async
-
 from django.conf.global_settings import PASSWORD_HASHERS
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
@@ -30,9 +28,18 @@ class NaturalKeysTestCase(TestCase):
         self.assertEqual(User.objects.get_by_natural_key("staff"), staff_user)
         self.assertEqual(staff_user.natural_key(), ("staff",))
 
+    async def test_auser_natural_key(self):
+        staff_user = await User.objects.acreate_user(username="staff")
+        self.assertEqual(await User.objects.aget_by_natural_key("staff"), staff_user)
+        self.assertEqual(staff_user.natural_key(), ("staff",))
+
     def test_group_natural_key(self):
         users_group = Group.objects.create(name="users")
         self.assertEqual(Group.objects.get_by_natural_key("users"), users_group)
+
+    async def test_agroup_natural_key(self):
+        users_group = await Group.objects.acreate(name="users")
+        self.assertEqual(await Group.objects.aget_by_natural_key("users"), users_group)
 
 
 class LoadDataWithoutNaturalKeysTestCase(TestCase):
@@ -301,9 +308,7 @@ class AbstractUserTestCase(TestCase):
 
     @override_settings(PASSWORD_HASHERS=PASSWORD_HASHERS)
     async def test_acheck_password_upgrade(self):
-        user = await sync_to_async(User.objects.create_user)(
-            username="user", password="foo"
-        )
+        user = await User.objects.acreate_user(username="user", password="foo")
         initial_password = user.password
         self.assertIs(await user.acheck_password("foo"), True)
         hasher = get_hasher("default")
