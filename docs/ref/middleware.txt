@@ -208,6 +208,8 @@ enabled or disabled with a setting.
 
 * :setting:`SECURE_CONTENT_TYPE_NOSNIFF`
 * :setting:`SECURE_CROSS_ORIGIN_OPENER_POLICY`
+* :setting:`SECURE_CSP`
+* :setting:`SECURE_CSP_REPORT_ONLY`
 * :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS`
 * :setting:`SECURE_HSTS_PRELOAD`
 * :setting:`SECURE_HSTS_SECONDS`
@@ -463,6 +465,69 @@ in the :setting:`SECURE_REDIRECT_EXEMPT` setting.
     may need to set the :setting:`SECURE_PROXY_SSL_HEADER` setting.
 
 .. _nginx: https://nginx.org/
+
+.. _content-security-policy:
+
+Content Security Policy
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Content Security Policy (CSP) is a security standard that helps prevent a
+variety of attacks such as Cross-Site Scripting (XSS), clickjacking, and other
+code injection attacks resulting from the execution of malicious content in the
+trusted web page context. CSP works by restricting the sources of content that a
+browser can load for a given page.
+ 
+Both the :setting:`SECURE_CSP` and :setting:`SECURE_CSP_REPORT_ONLY` settings
+take a dictionary of CSP directives and value(s). If not configured, no CSP
+response headers will be set.
+
+The following constants are defined in ``django.middleware.constants.csp`` and
+can be used in your CSP configuration:
+
+- ``NONE``: Represents the ``'none'`` directive, which disallows all sources. -
+  ``REPORT_SAMPLE``: Represents the ``'report-sample'`` directive, which allows
+  the browser to include a sample of the violating code in the report.
+- ``SELF``: Represents the ``'self'`` directive, which allows resources from the
+  same origin.
+- ``STRICT_DYNAMIC``: Represents the ``'strict-dynamic'`` directive, which allows
+  dynamically added scripts to be executed.
+- ``UNSAFE_ALLOW_REDIRECTS``: Represents the ``'unsafe-allow-redirects'`` directive,
+  which allows redirects to unsafe sources.
+- ``UNSAFE_EVAL``: Represents the ``'unsafe-eval'`` directive, which allows the use
+  of ``eval()`` and similar methods.
+- ``UNSAFE_HASHES``: Represents the ``'unsafe-hashes'`` directive, which allows the
+  use of inline event handlers.
+- ``UNSAFE_INLINE``: Represents the ``'unsafe-inline'`` directive, which allows the
+  use of inline resources.
+- ``WASM_UNSAFE_EVAL``: Represents the ``'wasm-unsafe-eval'`` directive, which
+  allows the use of ``eval()`` in WebAssembly.
+
+An example content security policy that allows resources from the same origin,
+and specific resources for assets (javascript and CSS), media, connections
+(e.g. AJAX or WebSockets), and disallows all plugins, is as follows:
+
+.. code-block:: python
+
+    from django.middleware.constants import csp
+
+    SECURE_CSP = {
+        "default-src": [csp.SELF],
+        "script-src": [csp.SELF, "https://assets.example.com"],
+        "style-src": [csp.SELF, "https://assets.example.com"],
+        "img-src": [csp.SELF, "data:", "https://media.example.com"],
+        "connect-src": [csp.SELF, "https://api.example.com"],
+        "media-src": [csp.SELF, "https://media.example.com"],
+        "object-src": [csp.NONE],
+    }
+
+Setting the :setting:``SECURE_CSP_REPORT_ONLY``, which expects the same data
+structure, will not enforce any of the CSP directives and only report CSP
+errors in the browser console and to the specified reporting URL, if set.
+
+Check the MDN-Content-Security-Policy_ documentation for up to date information
+on the CSP directives and their usage.
+
+.. _MDN-Content-Security-Policy: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy
 
 Session middleware
 ------------------

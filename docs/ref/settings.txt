@@ -2353,6 +2353,30 @@ Unless set to ``None``, the
 :ref:`cross-origin-opener-policy` header on all responses that do not already
 have it to the value provided.
 
+.. setting:: SECURE_CSP
+
+``SECURE_CSP``
+--------------
+
+Default: ``{}``
+
+If configured with Content Security Policy directives, the
+:class:`~django.middleware.security.SecurityMiddleware` sets the
+:ref:`Content-Security-Policy <content-security-policy>` header on all responses
+that do not already have it.
+
+.. setting:: SECURE_CSP_REPORT_ONLY
+
+``SECURE_CSP_REPORT_ONLY``
+--------------------------
+
+Default: ``{}``
+
+If configured with Content Security Policy directives, the
+:class:`~django.middleware.security.SecurityMiddleware` sets the
+:ref:`Content-Security-Policy <content-security-policy>` header on all responses
+that do not already have it.
+
 .. setting:: SECURE_HSTS_INCLUDE_SUBDOMAINS
 
 ``SECURE_HSTS_INCLUDE_SUBDOMAINS``
