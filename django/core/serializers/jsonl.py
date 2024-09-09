@@ -4,6 +4,7 @@ Serialize data to/from JSON Lines
 
 import json
 
+from django.core.serializers import base
 from django.core.serializers.base import DeserializationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.serializers.python import Deserializer as PythonDeserializer
@@ -39,19 +40,34 @@ class Serializer(PythonSerializer):
         return super(PythonSerializer, self).getvalue()
 
 
-def Deserializer(stream_or_string, **options):
+class Deserializer(base.Deserializer):
     """Deserialize a stream or string of JSON data."""
-    if isinstance(stream_or_string, bytes):
-        stream_or_string = stream_or_string.decode()
-    if isinstance(stream_or_string, (bytes, str)):
-        stream_or_string = stream_or_string.split("\n")
 
-    for line in stream_or_string:
-        if not line.strip():
-            continue
-        try:
-            yield from PythonDeserializer([json.loads(line)], **options)
-        except (GeneratorExit, DeserializationError):
-            raise
-        except Exception as exc:
-            raise DeserializationError() from exc
+    def __init__(self, stream_or_string, **options):
+        super().__init__(stream_or_string, **options)
+        self._iterator = None
+
+    def __iter__(self):
+        self._iterator = self._handle_object()
+        return self._iterator
+
+    def __next__(self):
+        if self._iterator is None:
+            self.__iter__()
+        return next(self._iterator)
+
+    def _handle_object(self):
+        if isinstance(self.stream, bytes):
+            self.stream = self.stream.decode()
+        if isinstance(self.stream, (bytes, str)):
+            self.stream = self.stream.split("\n")
+
+        for line in self.stream:
+            if not line.strip():
+                continue
+            try:
+                yield from PythonDeserializer([json.loads(line)], **self.options)
+            except (GeneratorExit, DeserializationError):
+                raise
+            except Exception as exc:
+                raise DeserializationError() from exc

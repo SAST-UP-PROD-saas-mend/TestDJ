@@ -10,6 +10,7 @@ from io import StringIO
 
 import yaml
 
+from django.core.serializers import base
 from django.core.serializers.base import DeserializationError
 from django.core.serializers.python import Deserializer as PythonDeserializer
 from django.core.serializers.python import Serializer as PythonSerializer
@@ -66,17 +67,34 @@ class Serializer(PythonSerializer):
         return super(PythonSerializer, self).getvalue()
 
 
-def Deserializer(stream_or_string, **options):
+class Deserializer(base.Deserializer):
     """Deserialize a stream or string of YAML data."""
-    if isinstance(stream_or_string, bytes):
-        stream_or_string = stream_or_string.decode()
-    if isinstance(stream_or_string, str):
-        stream = StringIO(stream_or_string)
-    else:
-        stream = stream_or_string
-    try:
-        yield from PythonDeserializer(yaml.load(stream, Loader=SafeLoader), **options)
-    except (GeneratorExit, DeserializationError):
-        raise
-    except Exception as exc:
-        raise DeserializationError() from exc
+
+    def __init__(self, stream_or_string, **options):
+        super().__init__(stream_or_string, **options)
+        self._iterator = None
+
+    def __iter__(self):
+        self._iterator = self._handle_object()
+        return self._iterator
+
+    def __next__(self):
+        if self._iterator is None:
+            self.__iter__()
+        return next(self._iterator)
+
+    def _handle_object(self):
+        if isinstance(self.stream, bytes):
+            self.stream = self.stream.decode()
+        if isinstance(self.stream, str):
+            stream = StringIO(self.stream)
+        else:
+            stream = self.stream
+        try:
+            yield from PythonDeserializer(
+                yaml.load(stream, Loader=SafeLoader), **self.options
+            )
+        except (GeneratorExit, DeserializationError):
+            raise
+        except Exception as exc:
+            raise DeserializationError() from exc

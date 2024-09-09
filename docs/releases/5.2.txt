@@ -237,7 +237,8 @@ Security
 Serialization
 ~~~~~~~~~~~~~
 
-* ...
+* Deserializer function is replaced with the Deserializer class to make it
+  extensible and easier to modify.
 
 Signals
 ~~~~~~~
