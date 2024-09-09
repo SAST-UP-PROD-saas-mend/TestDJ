@@ -1,13 +1,6 @@
 {
   "scans": {
     "engines": ["104"],
-    "template": "",
-    "exclusions": [],
-    "timeouts": {
-      "perLanguage": 480,
-      "perFile": 60
-    },
-    "maxFileSize": 1024,
     "pythonEngineGeneration": 2
   }
 }
