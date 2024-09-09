@@ -134,7 +134,7 @@ class AddField(FieldOperation):
         ):
             if isinstance(operation, AlterField):
                 return [
-                    AddField(
+                    self.__class__(
                         model_name=self.model_name,
                         name=operation.name,
                         field=operation.field,
@@ -144,7 +144,7 @@ class AddField(FieldOperation):
                 return []
             elif isinstance(operation, RenameField):
                 return [
-                    AddField(
+                    self.__class__(
                         model_name=self.model_name,
                         name=operation.new_name,
                         field=self.field,
@@ -264,7 +264,7 @@ class AlterField(FieldOperation):
         ):
             return [
                 operation,
-                AlterField(
+                self.__class__(
                     model_name=self.model_name,
                     name=operation.new_name,
                     field=self.field,
@@ -351,7 +351,7 @@ class RenameField(FieldOperation):
             and self.new_name_lower == operation.old_name_lower
         ):
             return [
-                RenameField(
+                self.__class__(
                     self.model_name,
                     self.old_name,
                     operation.new_name,
