@@ -186,3 +186,31 @@ class CastTests(TestCase):
             ).get(),
             "1",
         )
+
+    @unittest.skipUnless(connection.vendor == "sqlite", "SQLite test")
+    def test_cast_to_json_field_on_sqlite(self):
+        """
+        SQLite has no native JSON data type. Instead of using CAST(),
+        we use the JSON() function so SQLite knows to treat it
+        as JSON data instead of a plain string.
+        """
+        with CaptureQueriesContext(connection) as captured_queries:
+            list(
+                Author.objects.annotate(
+                    cast_json=Cast(models.Value('{"age": 20}'), models.JSONField())
+                )
+            )
+        self.assertIn(
+            "JSON('{\"age\": 20}')",
+            captured_queries[0]["sql"],
+        )
+
+    def test_cast_to_json_field(self):
+        """
+        Some database backends (e.g. MariaDB, Oracle, and SQLite) do not support
+        explicit cast to JSON. Ensure that our workarounds work on those databases.
+        """
+        json_value = Author.objects.annotate(
+            cast_json=Cast(models.Value('{"age": 20}'), models.JSONField())
+        )
+        self.assertEqual(json_value.get().cast_json, {"age": 20})
