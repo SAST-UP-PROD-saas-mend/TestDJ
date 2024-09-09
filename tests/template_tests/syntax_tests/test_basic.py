@@ -164,6 +164,65 @@ class BasicSyntaxTests(SimpleTestCase):
         else:
             self.assertEqual(output, "")
 
+    @setup({"basic-syntax19a": "{{ klass.in_template }}"})
+    def test_access_class_property(self):
+        class MyClass(list):
+            in_template = True
+            do_not_call_in_templates = True  # prevent instantiation
+
+        output = self.engine.render_to_string("basic-syntax19a", {"klass": MyClass})
+        self.assertEqual(output, "True")
+
+    @setup({"basic-syntax19b": "{{ klass.render_class }}"})
+    def test_access_class_method(self):
+        class MyClass(list):
+            do_not_call_in_templates = True  # prevent instantiation
+
+            @classmethod
+            def render_class(cls):
+                return "True"
+
+        output = self.engine.render_to_string("basic-syntax19b", {"klass": MyClass})
+        self.assertEqual(output, "True")
+
+    @setup({"basic-syntax19c": "{{ klass.in_template }}"})
+    def test_access_class_property_returned_by_callable(self):
+        class MyClass(list):
+            in_template = True
+
+        def get_my_class():
+            return MyClass
+
+        # Pass the callable to return the class which prevents instantiating the class
+        output = self.engine.render_to_string(
+            "basic-syntax19c", {"klass": get_my_class}
+        )
+        self.assertEqual(output, "True")
+
+    @setup({"basic-syntax19d": "{{ meals.lunch }}"})
+    def test_access_class_property_if_getitem_is_defined_in_metaclass(self):
+        """
+        If the metaclass defines __getitem__, the template system should use
+        it to resolve the dot notation.
+        """
+
+        # Metaclass defines __getitem__
+        class MealMeta(type):
+            def __getitem__(cls, name):
+                return getattr(cls, name) + " is yummy."
+
+        class Meals(metaclass=MealMeta):
+            lunch = "sandwich"
+            do_not_call_in_templates = True
+
+        # Pass the callable to return the class which prevents instantiating the class
+        output = self.engine.render_to_string("basic-syntax19d", {"meals": Meals})
+        # Dot notation in python is different from the __getitem__ method
+        self.assertNotEquals(Meals.lunch, Meals["lunch"])
+        # The template system uses the __getitem__ method to resolve the dot notation
+        # in this case
+        self.assertEqual(output, Meals["lunch"])
+
     @setup({"basic-syntax20": "{{ var.method2 }}"})
     def test_basic_syntax20(self):
         """

@@ -880,6 +880,10 @@ class Variable:
         try:  # catch-all for silent variable failures
             for bit in self.lookups:
                 try:  # dictionary lookup
+                    # Do not allow dictionary lookup on classes (unless the metaclass
+                    # implements __getitem__), they might be type hints
+                    if not hasattr(type(current), "__getitem__"):
+                        raise TypeError
                     current = current[bit]
                     # ValueError/IndexError are for numpy.array lookup on
                     # numpy < 1.9 and 1.9+ respectively
