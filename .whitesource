@@ -25,6 +25,8 @@
   },
   "scanSettingsSAST": {
     "enableScan": true,
+    "engines": ["104"],
+    "pythonEngineGeneration": 2, 
     "scanPullRequests": true,
     "enableRemediation": true,
     "incrementalScan": false,
