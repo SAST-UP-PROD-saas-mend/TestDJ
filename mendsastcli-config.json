@@ -1,6 +1,4 @@
 {
-  "scans": {
-    "engines": ["104"],
-    "pythonEngineGeneration": 2
-  }
+  "engines": ["104"],
+  "pythonEngineGeneration": 2
 }
