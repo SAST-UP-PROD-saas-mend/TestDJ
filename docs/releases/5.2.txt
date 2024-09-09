@@ -200,6 +200,11 @@ Management Commands
   setting the :envvar:`HIDE_PRODUCTION_WARNING` environment variable to
   ``"true"``.
 
+* The :djadmin:`shell` management command now automatically imports all models
+  from all installed apps. See the guide on :ref:`customizing this behavior
+  <customizing-shell-auto-imports>` to add extra imports or remove the new
+  defaults.
+
 Migrations
 ~~~~~~~~~~
 
