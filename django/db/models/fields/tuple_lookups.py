@@ -36,24 +36,11 @@ class TupleLookupMixin:
             )
 
     def check_rhs_length_equals_lhs_length(self):
-        if len(self.lhs) != len(self.rhs):
+        len_lhs = len(self.lhs)
+        if len_lhs != len(self.rhs):
             raise ValueError(
                 f"'{self.lookup_name}' lookup of '{self.lhs.field.name}' field "
-                f"must have {len(self.lhs)} elements"
-            )
-
-    def check_rhs_is_collection_of_tuples_or_lists(self):
-        if not all(isinstance(vals, (tuple, list)) for vals in self.rhs):
-            raise ValueError(
-                f"'{self.lookup_name}' lookup of '{self.lhs.field.name}' field "
-                f"must be a collection of tuples or lists"
-            )
-
-    def check_rhs_elements_length_equals_lhs_length(self):
-        if not all(len(self.lhs) == len(vals) for vals in self.rhs):
-            raise ValueError(
-                f"'{self.lookup_name}' lookup of '{self.lhs.field.name}' field "
-                f"must have {len(self.lhs)} elements each"
+                f"must have {len_lhs} elements"
             )
 
     def as_sql(self, compiler, connection):
@@ -196,6 +183,21 @@ class TupleIn(TupleLookupMixin, In):
         self.check_rhs_is_tuple_or_list()
         self.check_rhs_is_collection_of_tuples_or_lists()
         self.check_rhs_elements_length_equals_lhs_length()
+
+    def check_rhs_is_collection_of_tuples_or_lists(self):
+        if not all(isinstance(vals, (tuple, list)) for vals in self.rhs):
+            raise ValueError(
+                f"'{self.lookup_name}' lookup of '{self.lhs.field.name}' field "
+                "must be a collection of tuples or lists"
+            )
+
+    def check_rhs_elements_length_equals_lhs_length(self):
+        len_lhs = len(self.lhs)
+        if not all(len_lhs == len(vals) for vals in self.rhs):
+            raise ValueError(
+                f"'{self.lookup_name}' lookup of '{self.lhs.field.name}' field "
+                f"must have {len_lhs} elements each"
+            )
 
     def as_sql(self, compiler, connection):
         if not self.rhs:
