@@ -612,6 +612,17 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         coords.reverse()
         self.assertEqual(tuple(coords), track.reverse_geom.coords)
 
+    @skipUnlessDBFeature("has_Rotate_function")
+    def test_rotate(self):
+        angle = math.pi
+        qs = Country.objects.annotate(rotated=functions.Rotate("mpoly", angle=angle))
+        for c in qs:
+            for p1, p2 in zip(c.mpoly, c.rotated):
+                for r1, r2 in zip(p1, p2):
+                    for c1, c2 in zip(r1.coords, r2.coords):
+                        self.assertAlmostEqual(c1[0], -c2[0], 5)
+                        self.assertAlmostEqual(c1[1], -c2[1], 5)
+
     @skipUnlessDBFeature("has_Scale_function")
     def test_scale(self):
         xfac, yfac = 2, 3
