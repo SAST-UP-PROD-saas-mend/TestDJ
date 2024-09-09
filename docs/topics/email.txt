@@ -12,10 +12,10 @@ development, and to provide support for platforms that can't use SMTP.
 
 The code lives in the ``django.core.mail`` module.
 
-Quick example
-=============
+Quick examples
+==============
 
-In two lines::
+Use :func:`send_mail` for simpler cases. For example, to send a plain text only message::
 
     from django.core.mail import send_mail
 
@@ -26,6 +26,40 @@ In two lines::
         ["to@example.com"],
         fail_silently=False,
     )
+
+Use :class:`EmailMessage` or :class:`EmailMultiAlternatives` for additional
+functionality.
+For example, to send an HTML and plain text message using a template and
+custom headers::
+
+    from django.core.mail import EmailMultiAlternatives
+    from django.template.loader import render_to_string
+
+    # Render plain text content from template
+    text_content = render_to_string(
+        "templates/emails/my_email.txt",
+        context={"my_variable": 42},
+    )
+
+    # Render HTML content from template
+    html_content = render_to_string(
+        "templates/emails/my_email.html",
+        context={"my_variable": 42},
+    )
+
+    # Create email object
+    msg = EmailMultiAlternatives(
+        "Subject here",
+        text_content,
+        "from@example.com",
+        ["to@example.com"],
+        headers={"List-Unsubscribe": "<mailto:unsub@example.com>"},
+    )
+
+    # Attach HTML content to email object
+    msg.attach_alternative(html_content, "text/html")
+
+    msg.send()
 
 Mail is sent using the SMTP host and port specified in the
 :setting:`EMAIL_HOST` and :setting:`EMAIL_PORT` settings. The
