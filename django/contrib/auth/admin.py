@@ -147,6 +147,7 @@ class UserAdmin(admin.ModelAdmin):
         defaults = {
             "auto_populated_fields": (),
             "username_help_text": username_field.help_text,
+            "username_field_name": username_field.verbose_name,
         }
         extra_context.update(defaults)
         return super().add_view(request, form_url, extra_context)
