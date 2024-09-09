@@ -9,4 +9,6 @@ Django 5.1.2 fixes several bugs in 5.1.1.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 5.1 that caused a crash of ``.filter(...)`` when 
+  ``Concat`` is used in combination with ``trigram_similar`` due to using 
+  double pipes without wrapping it in parenthesis (:ticket:`35732`).
